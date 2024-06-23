@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">AndroidProject</string>
+    <string name="submit_transaction">Submit Transaction</string>
+    <string name="type">Type</string>
+    <string name="dialog_header">Please enter your starting balance</string>
+    <string name="balance_example">200.00€</string>
+    <string name="ok">OK</string>
+    <string-array name="transaction_frequency">
+        <item>Only once</item>
+        <item>Once a week</item>
+        <item>Once a month</item>
+    </string-array>
 </resources>

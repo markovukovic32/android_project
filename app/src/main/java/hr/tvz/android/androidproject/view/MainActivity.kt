@@ -32,8 +32,11 @@ class MainActivity : AppCompatActivity() {
             val selectedDate = "$dayOfMonth/${month + 1}/$year"
             onDateSelected(selectedDate)
         }
+        val dialog = BalanceDialog(mainController)
         setContentView(view)
+        dialog.show(supportFragmentManager, "BalanceDialog")
     }
+
 
     private fun onDateSelected(date: String) {
         // Handle the selected date here
