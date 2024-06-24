@@ -10,6 +10,9 @@ import hr.tvz.android.androidproject.controller.MainController
 import hr.tvz.android.androidproject.databinding.ActivityMainBinding
 import hr.tvz.android.androidproject.databinding.DialogBalanceBinding
 import hr.tvz.android.androidproject.model.Balance
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class BalanceDialog(private val mainController: MainController) : DialogFragment() {
     private lateinit var binding: DialogBalanceBinding
@@ -25,8 +28,11 @@ class BalanceDialog(private val mainController: MainController) : DialogFragment
                         val balanceEditText = binding.balance
                         val balanceValue = balanceEditText.text.toString().toDoubleOrNull()
                         if (balanceValue != null) {
+                            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            val currentDate = sdf.format(Date())
                             val balance = Balance(
-                                current_balance = balanceValue
+                                current_balance = balanceValue,
+                                date = currentDate
                             )
                             mainController.setBalance(balance)
                         } else {

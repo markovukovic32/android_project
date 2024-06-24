@@ -1,21 +1,30 @@
 package hr.tvz.android.androidproject.view
 
+import TransactionAdapter
 import android.os.Bundle
 import android.view.View
 import android.widget.CalendarView
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import hr.tvz.android.androidproject.R
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.room.Room
 import hr.tvz.android.androidproject.controller.MainController
 import hr.tvz.android.androidproject.databinding.ActivityMainBinding
-import hr.tvz.android.androidproject.databinding.ActivityNewTransactionBinding
+import hr.tvz.android.androidproject.model.AppDatabase
+import hr.tvz.android.androidproject.model.Balance
+import hr.tvz.android.androidproject.model.BalanceDao
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     private lateinit var mainController : MainController
     private lateinit var binding: ActivityMainBinding
+    private var db: AppDatabase? = null
+    private var balanceDao: BalanceDao? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         mainController = MainController(this)
         super.onCreate(savedInstanceState)
@@ -28,19 +37,31 @@ class MainActivity : AppCompatActivity() {
         }
         val calendarView: CalendarView = binding.calendarView
         calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
-            // The month is 0-indexed, so you may need to add 1 to get the correct month
             val selectedDate = "$dayOfMonth/${month + 1}/$year"
             onDateSelected(selectedDate)
         }
-        val dialog = BalanceDialog(mainController)
         setContentView(view)
-        dialog.show(supportFragmentManager, "BalanceDialog")
+        initializeDatabase()
+        val balance = balanceDao?.getAll()
+        if (balance != null) {
+            if(balance.isEmpty()){
+                val dialog = BalanceDialog(mainController)
+                dialog.show(supportFragmentManager, "BalanceDialog")
+            }
+            else{
+                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                val currentDate = sdf.format(Date())
+                setBalance(getBalanceUntilDate(currentDate))
+            }
+        }
+    }
+
+    fun getBalanceUntilDate(date: String): Balance {
+        return mainController.getBalanceUntilDate(date)
     }
 
 
     private fun onDateSelected(date: String) {
-        // Handle the selected date here
-        // You can call a method in your controller to handle the selected date
         mainController.onDateSelected(date)
     }
     fun updateDateTextView(date: String) {
@@ -49,5 +70,22 @@ class MainActivity : AppCompatActivity() {
     }
     fun addTransaction(view: View) {
         mainController.addTransaction()
+    }
+    private fun initializeDatabase() {
+        val db = Room.databaseBuilder(
+            this.applicationContext,
+            AppDatabase::class.java, "transaction-database"
+        ).fallbackToDestructiveMigration().allowMainThreadQueries().build()
+        this.db = db
+        this.balanceDao = db.balanceDao()
+    }
+
+    fun setBalance(balance: Balance) {
+        binding.balance.text = "Current balance: " + getBalanceUntilDate(balance.date).current_balance + " EUR"
+    }
+
+    fun setAdapter(transactionAdapter: TransactionAdapter) {
+        binding.transactionRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.transactionRecyclerView.adapter = transactionAdapter
     }
 }

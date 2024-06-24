@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 2,
-    "identityHash": "cc2c4abc7acc98a9765c1569fa4aa173",
+    "version": 3,
+    "identityHash": "b281b4577ff092f22388c892b30a3c05",
     "entities": [
       {
         "tableName": "financial_transaction",
@@ -56,7 +56,7 @@
       },
       {
         "tableName": "balance",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER PRIMARY KEY AUTOINCREMENT, `current_balance` REAL, `date` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER PRIMARY KEY AUTOINCREMENT, `current_balance` REAL NOT NULL, `date` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "uid",
@@ -68,13 +68,13 @@
             "fieldPath": "current_balance",
             "columnName": "current_balance",
             "affinity": "REAL",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "date",
             "columnName": "date",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -90,7 +90,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cc2c4abc7acc98a9765c1569fa4aa173')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b281b4577ff092f22388c892b30a3c05')"
     ]
   }
 }
