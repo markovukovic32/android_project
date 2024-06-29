@@ -13,6 +13,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/current_balance_0" />
+    <Button
+        android:id="@+id/overview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="See all transactions"
+        android:onClick="showOverview"
+        android:layout_gravity="end"/>
 
     <CalendarView
         android:id="@+id/calendarView"

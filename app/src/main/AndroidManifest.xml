@@ -22,6 +22,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".view.NewTransactionActivity"></activity>
+        <activity android:name=".view.TransactionOverviewActivity"></activity>
     </application>
 
 </manifest>

@@ -5,14 +5,16 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import hr.tvz.android.androidproject.R
+import hr.tvz.android.androidproject.controller.MainController
 import hr.tvz.android.androidproject.model.Transaction
 
-class TransactionAdapter(private val transactions: List<Transaction>) : RecyclerView.Adapter<TransactionAdapter.ViewHolder>() {
+class TransactionAdapter(private val transactions: List<Transaction>, private val mainController: MainController) : RecyclerView.Adapter<TransactionAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.name)
         val amount: TextView = view.findViewById(R.id.amount)
         val date: TextView = view.findViewById(R.id.date)
         val type: TextView = view.findViewById(R.id.type)
+        val deleteButton: View = view.findViewById(R.id.deleteButton)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -39,6 +41,17 @@ class TransactionAdapter(private val transactions: List<Transaction>) : Recycler
         } else {
             holder.itemView.setBackgroundColor(Color.argb(255, 255, 200, 200)) // Light red
         }
+
+        holder.deleteButton.tag = transaction.uid
+        holder.deleteButton.setOnClickListener { view ->
+            val transactionId = view.tag as Int
+            deleteTransaction(transactionId)
+        }
+    }
+
+    private fun deleteTransaction(transactionId: Int) {
+        mainController.deleteTransaction(transactionId)
+        mainController.refreshBalance()
     }
 
     override fun getItemCount() = transactions.size

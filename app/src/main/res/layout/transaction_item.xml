@@ -6,45 +6,55 @@
     android:layout_margin="8dp"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp">
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:padding="16dp">
-
-        <TextView
-            android:id="@+id/name"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Transaction Name"
-            android:textSize="18sp"
-            android:textColor="@android:color/black" />
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="16dp">
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Transaction Name"
+                android:textSize="18sp"
+                android:textColor="@android:color/black" />
 
-        <TextView
-            android:id="@+id/amount"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Amount"
-            android:textSize="16sp"
-            android:textColor="@android:color/darker_gray" />
+            <TextView
+                android:id="@+id/amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Amount"
+                android:textSize="16sp"
+                android:textColor="@android:color/darker_gray" />
 
-        <TextView
-            android:id="@+id/date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Date"
-            android:textSize="16sp"
-            android:textColor="@android:color/darker_gray" />
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Date"
+                android:textSize="16sp"
+                android:textColor="@android:color/darker_gray" />
 
-        <TextView
-            android:id="@+id/type"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Type"
-            android:textSize="16sp"
-            android:textColor="@android:color/darker_gray" />
-
+            <TextView
+                android:id="@+id/type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Type"
+                android:textSize="16sp"
+                android:textColor="@android:color/darker_gray" />
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/deleteButton"
+            android:layout_width="32pt"
+            android:layout_height="32pt"
+            android:src="@drawable/delete"
+            android:onClick="deleteTransaction"
+            android:layout_gravity="center_vertical" />
     </LinearLayout>
-
 </androidx.cardview.widget.CardView>
