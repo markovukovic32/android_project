@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
             val selectedDate = "$dayOfMonth/${month + 1}/$year"
             onDateSelected(selectedDate)
         }
+        onDateSelected(getDate(Date()))
         setContentView(view)
         initializeDatabase()
         val balance = balanceDao?.getAll()
