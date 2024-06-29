@@ -9,6 +9,8 @@ import androidx.room.Query
 interface TransactionDao {
     @Query("SELECT * FROM financial_transaction")
     fun getAll(): List<Transaction>
+    @Query("SELECT * FROM financial_transaction WHERE uid = :id")
+    fun getTransactionById(id: Int): Transaction
     @Insert
     fun insertAll(vararg transactions: Transaction)
     @Delete

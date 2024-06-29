@@ -56,7 +56,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    private fun getDate(date: Date): String {
+    override fun onResume() {
+        super.onResume()
+        onDateSelected(getDate(Date()))
+        mainController.refreshBalance()
+    }
+    fun getDate(date: Date): String {
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         return sdf.format(date)
     }
@@ -92,5 +97,9 @@ class MainActivity : AppCompatActivity() {
     fun setAdapter(transactionAdapter: TransactionAdapter) {
         binding.transactionRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.transactionRecyclerView.adapter = transactionAdapter
+    }
+
+    fun showOverview(view: View) {
+        mainController.showTransactionOverview()
     }
 }
