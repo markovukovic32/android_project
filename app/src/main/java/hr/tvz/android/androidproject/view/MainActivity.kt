@@ -2,6 +2,7 @@ package hr.tvz.android.androidproject.view
 
 import TransactionAdapter
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.CalendarView
 import android.widget.TextView
@@ -49,11 +50,14 @@ class MainActivity : AppCompatActivity() {
                 dialog.show(supportFragmentManager, "BalanceDialog")
             }
             else{
-                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                val currentDate = sdf.format(Date())
+                val currentDate = getDate(Date())
                 setBalance(getBalanceUntilDate(currentDate))
             }
         }
+    }
+    private fun getDate(date: Date): String {
+        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        return sdf.format(date)
     }
 
     fun getBalanceUntilDate(date: String): Balance {
@@ -81,7 +85,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setBalance(balance: Balance) {
-        binding.balance.text = "Current balance: " + getBalanceUntilDate(balance.date).current_balance + " EUR"
+        binding.balance.text = "Current balance: " + balance.current_balance + " EUR"
     }
 
     fun setAdapter(transactionAdapter: TransactionAdapter) {
