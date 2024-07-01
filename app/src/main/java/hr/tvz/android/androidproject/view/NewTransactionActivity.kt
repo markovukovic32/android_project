@@ -29,6 +29,8 @@ class NewTransactionActivity : AppCompatActivity() {
             binding.type.text = if (isChecked) "Expense" else "Income"
         }
         val calendarView: CalendarView = binding.date
+        date = System.currentTimeMillis()
+        calendarView.date = date
         calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
             val c = Calendar.getInstance()
             c[year, month] = dayOfMonth

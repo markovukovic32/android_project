@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
         val calendarView: CalendarView = binding.calendarView
+        calendarView.date = System.currentTimeMillis()
         calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
             val selectedDate = "$dayOfMonth/${month + 1}/$year"
             onDateSelected(selectedDate)

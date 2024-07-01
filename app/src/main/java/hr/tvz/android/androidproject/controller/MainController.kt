@@ -60,7 +60,7 @@ class MainController() {
         val transactions = getTransactionOnDate(newDate)
         mainActivity?.let { setAdapter(transactions, it) }
     }
-    public fun displayBalanceOnDate(newDate: String) {
+    fun displayBalanceOnDate(newDate: String) {
         mainActivity?.updateDateTextView("Balance on " + newDate + " is " + getBalanceUntilDate(newDate).current_balance + "EUR.")
     }
     fun initializeAdapter(){
