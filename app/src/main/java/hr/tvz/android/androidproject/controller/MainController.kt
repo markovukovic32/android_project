@@ -18,6 +18,7 @@ import hr.tvz.android.androidproject.view.NewTransactionActivity
 import hr.tvz.android.androidproject.view.TransactionOverviewActivity
 import java.util.Locale
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MainController() {
     private var mainActivity: MainActivity? = null
@@ -60,14 +61,14 @@ class MainController() {
         val transactions = getTransactionOnDate(newDate)
         mainActivity?.let { setAdapter(transactions, it) }
     }
-    fun displayBalanceOnDate(newDate: String) {
+    private fun displayBalanceOnDate(newDate: String) {
         mainActivity?.updateDateTextView("Balance on " + newDate + " is " + getBalanceUntilDate(newDate).current_balance + "EUR.")
     }
     fun initializeAdapter(){
         val transactions = getAllTransactions()
         transactionOverviewActivity?.let { setAdapter(transactions, it) }
     }
-    fun setAdapter(transactions: List<Transaction>, activity: AppCompatActivity) {
+    private fun setAdapter(transactions: List<Transaction>, activity: AppCompatActivity) {
         val transactionAdapter = TransactionAdapter(transactions, this)
         when (activity) {
             is MainActivity -> activity.setAdapter(transactionAdapter)
@@ -91,13 +92,57 @@ class MainController() {
         val balance = balanceDao!!.getAll()[0]
 
         val balanceDate = sdf.parse(balance.date)
+        if(endDate!!.before(balanceDate)){
+            return balance
+        }
 
         transactions?.forEach { transaction ->
-            val transactionDate = sdf.parse(transaction.date!!)
+            var transactionDate = sdf.parse(transaction.date!!)
             transactionDate?.let {
-                if (it.after(balanceDate) && !it.after(endDate)) {
+                if (it.after(balanceDate) && !it.after(endDate) && transaction.frequency == "Only once") {
                     transaction.amount?.let { amount ->
-                        balance.current_balance += if (transaction.transactionType == "Income") amount else -amount
+                            balance.current_balance += if (transaction.transactionType == "Income") amount else -amount
+                    }
+                }
+                else{
+                    val calendar = Calendar.getInstance()
+                    calendar.time = transactionDate!!
+                    if(transaction.frequency == "Once a week"){
+                        while(transactionDate!!.before(balanceDate)){
+                            calendar.add(Calendar.WEEK_OF_YEAR, 1)
+                            transactionDate = calendar.time
+                        }
+                        val daysDifference = ((endDate.time - transactionDate!!.time) / (1000 * 60 * 60 * 24)).toInt()
+                        if(daysDifference < 0){
+                            return@forEach
+                        }
+
+                        val weeksDifference = daysDifference / 7 + 1
+                        transaction.amount?.let { amount ->
+                            balance.current_balance += if (transaction.transactionType == "Income") amount * weeksDifference else -amount * weeksDifference
+                        }
+                    }
+                    else if(transaction.frequency == "Once a month"){
+                        val endCalendar = Calendar.getInstance()
+                        endCalendar.time = endDate
+
+                        while(transactionDate!!.before(balanceDate)){
+                            calendar.add(Calendar.MONTH, 1)
+                            transactionDate = calendar.time
+                        }
+
+                        val monthsBetween = when {
+                            calendar.get(Calendar.YEAR) == endCalendar.get(Calendar.YEAR) -> endCalendar.get(Calendar.MONTH) - calendar.get(Calendar.MONTH)
+                            else -> 12 * (endCalendar.get(Calendar.YEAR) - calendar.get(Calendar.YEAR)) + endCalendar.get(Calendar.MONTH) - calendar.get(Calendar.MONTH)
+                        } + 1
+
+                        if(monthsBetween < 0){
+                            return@forEach
+                        }
+
+                        transaction.amount?.let { amount ->
+                            balance.current_balance += if (transaction.transactionType == "Income") amount * monthsBetween else -amount * monthsBetween
+                        }
                     }
                 }
             }
@@ -105,7 +150,43 @@ class MainController() {
         return balance
     }
     private fun getTransactionOnDate(date: String): List<Transaction> {
-        return transactionDao!!.getAll().filter { it.date == date }
+        val transactions = ArrayList<Transaction>()
+        for(transaction in transactionDao!!.getAll()){
+            if(transaction.frequency == "Only once"){
+                if(transaction.date == date){
+                    transactions.add(transaction)
+                }
+            }
+            else{
+                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                val transactionDate = sdf.parse(transaction.date!!)
+                val wantedDate = sdf.parse(date)
+
+                val cal = Calendar.getInstance()
+                if (transactionDate != null) {
+                    cal.time = transactionDate
+                }
+
+                val calWanted = Calendar.getInstance()
+                if (wantedDate != null) {
+                    calWanted.time = wantedDate
+                }
+
+                if(transaction.frequency == "Once a week" && !wantedDate!!.before(transactionDate)){
+                    if(cal.get(Calendar.DAY_OF_WEEK) == calWanted.get(Calendar.DAY_OF_WEEK) && cal.before(calWanted)){
+                        transactions.add(transaction)
+                    }
+                }
+                else if(transaction.frequency == "Once a month" && !wantedDate!!.before(transactionDate)){
+                    val lastDayOfWantedMonth= calWanted.getActualMaximum(Calendar.DAY_OF_MONTH)
+                    if(cal.get(Calendar.DAY_OF_MONTH) == calWanted.get(Calendar.DAY_OF_MONTH) || ((cal.get(Calendar.DAY_OF_MONTH) > lastDayOfWantedMonth) && (calWanted.get(Calendar.DAY_OF_MONTH) == lastDayOfWantedMonth))){
+                        if(cal.before(calWanted))
+                            transactions.add(transaction)
+                    }
+                }
+            }
+        }
+        return transactions
     }
     private fun getAllTransactions(): List<Transaction> {
         return transactionDao!!.getAll()
@@ -130,8 +211,6 @@ class MainController() {
             transactionOverviewActivity?.let { setAdapter(getAllTransactions(), it) }
             mainActivity?.let { setAdapter(getTransactionOnDate(date!!), it) }
             displayBalanceOnDate(date!!)
-        } else {
-            // Handle the case where there is no transaction with the given ID
         }
     }
 
