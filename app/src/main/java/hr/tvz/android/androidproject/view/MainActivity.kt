@@ -2,7 +2,6 @@ package hr.tvz.android.androidproject.view
 
 import TransactionAdapter
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.CalendarView
 import android.widget.TextView
@@ -11,6 +10,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.room.Room
+import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter
+import com.jjoe64.graphview.series.DataPoint
+import com.jjoe64.graphview.series.LineGraphSeries
 import hr.tvz.android.androidproject.controller.MainController
 import hr.tvz.android.androidproject.databinding.ActivityMainBinding
 import hr.tvz.android.androidproject.model.AppDatabase
@@ -19,6 +21,7 @@ import hr.tvz.android.androidproject.model.BalanceDao
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var mainController : MainController
@@ -56,25 +59,29 @@ class MainActivity : AppCompatActivity() {
                 setBalance(getBalanceUntilDate(currentDate))
             }
         }
+        mainController.setUpGraphView(binding.graph)
     }
+
     override fun onResume() {
         super.onResume()
         onDateSelected(getDate(Date()))
+
         mainController.refreshBalance()
     }
+
     fun getDate(date: Date): String {
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         return sdf.format(date)
     }
-
     fun getBalanceUntilDate(date: String): Balance {
         return mainController.getBalanceUntilDate(date)
     }
 
-
     private fun onDateSelected(date: String) {
         mainController.onDateSelected(date)
     }
+
+
     fun updateDateTextView(date: String) {
         val textView: TextView = binding.datum
         textView.text = date
@@ -90,7 +97,6 @@ class MainActivity : AppCompatActivity() {
         this.db = db
         this.balanceDao = db.balanceDao()
     }
-
     fun setBalance(balance: Balance) {
         binding.balance.text = "Current balance: " + balance.current_balance + " EUR"
     }
@@ -102,5 +108,10 @@ class MainActivity : AppCompatActivity() {
 
     fun showOverview(view: View) {
         mainController.showTransactionOverview()
+    }
+
+    fun setUpGraphView(series: LineGraphSeries<DataPoint>) {
+        binding.graph.gridLabelRenderer.labelFormatter = DateAsXAxisLabelFormatter(this, SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()))
+        binding.graph.addSeries(series)
     }
 }

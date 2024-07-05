@@ -7,6 +7,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
+import com.jjoe64.graphview.GraphView
+import com.jjoe64.graphview.series.DataPoint
+import com.jjoe64.graphview.series.LineGraphSeries
 import hr.tvz.android.androidproject.model.AppDatabase
 import hr.tvz.android.androidproject.model.Balance
 import hr.tvz.android.androidproject.model.BalanceDao
@@ -217,5 +220,20 @@ class MainController() {
     fun refreshBalance() {
         val currentDate = mainActivity?.getDate(Date())
         mainActivity?.setBalance(getBalanceUntilDate(currentDate!!))
+    }
+    fun setUpGraphView(graph: GraphView){
+        val dataPoints = mutableListOf<DataPoint>()
+        val calendar = Calendar.getInstance()
+
+        dataPoints.add(DataPoint(Date(), getBalanceUntilDate(mainActivity!!.getDate(Date())).current_balance))
+
+        for (i in 1..180) {
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+            val newDate = calendar.time
+            dataPoints.add(DataPoint(newDate, getBalanceUntilDate(mainActivity!!.getDate(newDate)).current_balance))
+        }
+
+        val series = LineGraphSeries(dataPoints.toTypedArray())
+        mainActivity!!.setUpGraphView(series)
     }
 }

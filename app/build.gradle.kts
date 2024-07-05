@@ -22,6 +22,20 @@ android {
             }
         }
     }
+    packaging{
+        resources {
+            resources.excludes.add("/META-INF/{AL2.0,LGPL2.1}")
+            resources.excludes.add("META-INF/DEPENDENCIES")
+            resources.excludes.add("META-INF/LICENSE")
+            resources.excludes.add("META-INF/LICENSE.txt")
+            resources.excludes.add("META-INF/license.txt")
+            resources.excludes.add("META-INF/NOTICE")
+            resources.excludes.add("META-INF/NOTICE.txt")
+            resources.excludes.add("META-INF/notice.txt")
+            resources.excludes.add("META-INF/ASL2.0")
+            resources.excludes.add("META-INF/*.kotlin_module")
+        }
+    }
 
     buildTypes {
         release {
@@ -57,4 +71,7 @@ dependencies {
     val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
+    implementation("com.jjoe64:graphview:4.2.1") {
+        exclude(mapOf("group" to "com.android.support"))
+    }
 }
