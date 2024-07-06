@@ -1,6 +1,7 @@
 package hr.tvz.android.androidproject.view
 
 import TransactionAdapter
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.CalendarView
@@ -59,13 +60,13 @@ class MainActivity : AppCompatActivity() {
                 setBalance(getBalanceUntilDate(currentDate))
             }
         }
-        mainController.setUpGraphView(binding.graph)
+        mainController.setUpGraphView()
     }
 
     override fun onResume() {
         super.onResume()
         onDateSelected(getDate(Date()))
-
+        mainController.setUpGraphView()
         mainController.refreshBalance()
     }
 
@@ -88,6 +89,7 @@ class MainActivity : AppCompatActivity() {
     }
     fun addTransaction(view: View) {
         mainController.addTransaction()
+        mainController.setUpGraphView()
     }
     private fun initializeDatabase() {
         val db = Room.databaseBuilder(
@@ -111,7 +113,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setUpGraphView(series: LineGraphSeries<DataPoint>) {
+        if(binding.graph.series.isNotEmpty()){
+            binding.graph.removeAllSeries()
+        }
         binding.graph.gridLabelRenderer.labelFormatter = DateAsXAxisLabelFormatter(this, SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()))
         binding.graph.addSeries(series)
+        if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT){
+            binding.graph.gridLabelRenderer.numHorizontalLabels = 3
+        }
+        else{
+            binding.graph.gridLabelRenderer.numHorizontalLabels = 6
+        }
     }
 }

@@ -52,6 +52,7 @@ class TransactionAdapter(private val transactions: List<Transaction>, private va
     private fun deleteTransaction(transactionId: Int) {
         mainController.deleteTransaction(transactionId)
         mainController.refreshBalance()
+        mainController.setUpGraphView()
     }
 
     override fun getItemCount() = transactions.size

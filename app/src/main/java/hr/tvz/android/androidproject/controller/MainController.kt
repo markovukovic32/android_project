@@ -221,7 +221,7 @@ class MainController() {
         val currentDate = mainActivity?.getDate(Date())
         mainActivity?.setBalance(getBalanceUntilDate(currentDate!!))
     }
-    fun setUpGraphView(graph: GraphView){
+    fun setUpGraphView(){
         val dataPoints = mutableListOf<DataPoint>()
         val calendar = Calendar.getInstance()
 
