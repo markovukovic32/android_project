@@ -11,14 +11,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        style="@style/LinearLayoutStylePaleGreen">
+
 
         <TextView
             android:id="@+id/transactionNameLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Transaction Name"
-            android:layout_marginTop="16dp"/>
+            android:layout_marginTop="16dp"
+            style="@style/GraphLabelStyle"/>
+
 
         <EditText
             android:id="@+id/transactionName"
@@ -32,7 +36,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Transaction Amount"
-            android:layout_marginTop="16dp"/>
+            android:layout_marginTop="16dp"
+            style="@style/GraphLabelStyle"/>
+
 
         <EditText
             android:id="@+id/transactionAmount"
@@ -47,7 +53,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Date"
-            android:layout_marginTop="16dp"/>
+            android:layout_marginTop="16dp"
+            style="@style/GraphLabelStyle"/>
+
 
         <CalendarView
             android:id="@+id/date"
@@ -60,7 +68,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Type"
-            android:layout_marginTop="16dp"/>
+            android:layout_marginTop="16dp"
+            style="@style/GraphLabelStyle"/>
+
 
         <Switch
             android:id="@+id/type"
@@ -73,7 +83,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/type"
-            android:layout_marginTop="16dp"/>
+            android:layout_marginTop="16dp"
+            style="@style/GraphLabelStyle"/>
 
         <Spinner
             android:id="@+id/frequency"
@@ -87,7 +98,8 @@
             android:layout_height="wrap_content"
             android:text="@string/submit_transaction"
             android:layout_marginTop="16dp"
-            android:onClick="addTransaction"/>
+            android:onClick="addTransaction"
+            style="@style/ButtonStyle"/>
 
     </LinearLayout>
 </ScrollView>
