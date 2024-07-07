@@ -199,6 +199,7 @@ class MainController() {
         return transactionDao!!.getAll()
     }
     fun setBalance(balance: Balance) {
+        balanceDao?.delete(balanceDao!!.getAll()[0])
         balanceDao?.insertAll(balance)
         mainActivity?.getBalanceUntilDate(balance.date)
     }

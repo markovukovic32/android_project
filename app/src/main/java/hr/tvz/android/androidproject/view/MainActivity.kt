@@ -27,7 +27,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -149,10 +148,15 @@ class MainActivity : AppCompatActivity() {
                     val dateView: TextView = dialog.findViewById(R.id.popupDate)
                     val balanceView: TextView = dialog.findViewById(R.id.popupBalance)
                     dateView.text = "Date: $date"
-                    balanceView.text = "Balance: $balance"
+                    balanceView.text = "Balance: $balance EUR"
                     dialog.show()
                 }
             }
         }
+    }
+
+    fun editBalance(view: View) {
+        val dialog = BalanceDialog(mainController)
+        dialog.show(supportFragmentManager, "BalanceDialog")
     }
 }
