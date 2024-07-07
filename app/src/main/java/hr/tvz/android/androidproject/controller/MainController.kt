@@ -19,6 +19,10 @@ import java.text.SimpleDateFormat
 import hr.tvz.android.androidproject.view.MainActivity
 import hr.tvz.android.androidproject.view.NewTransactionActivity
 import hr.tvz.android.androidproject.view.TransactionOverviewActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Locale
 import java.util.*
 import kotlin.collections.ArrayList
@@ -221,19 +225,24 @@ class MainController() {
         val currentDate = mainActivity?.getDate(Date())
         mainActivity?.setBalance(getBalanceUntilDate(currentDate!!))
     }
-    fun setUpGraphView(){
-        val dataPoints = mutableListOf<DataPoint>()
-        val calendar = Calendar.getInstance()
+    fun setUpGraphView() {
+        CoroutineScope(Dispatchers.Default).launch {
+            val dataPoints = mutableListOf<DataPoint>()
+            val calendar = Calendar.getInstance()
 
-        dataPoints.add(DataPoint(Date(), getBalanceUntilDate(mainActivity!!.getDate(Date())).current_balance))
+            dataPoints.add(DataPoint(Date(), getBalanceUntilDate(mainActivity!!.getDate(Date())).current_balance))
 
-        for (i in 1..180) {
-            calendar.add(Calendar.DAY_OF_YEAR, 1)
-            val newDate = calendar.time
-            dataPoints.add(DataPoint(newDate, getBalanceUntilDate(mainActivity!!.getDate(newDate)).current_balance))
+            for (i in 1..180) {
+                calendar.add(Calendar.DAY_OF_YEAR, 1)
+                val newDate = calendar.time
+                dataPoints.add(DataPoint(newDate, getBalanceUntilDate(mainActivity!!.getDate(newDate)).current_balance))
+            }
+
+            val series = LineGraphSeries(dataPoints.toTypedArray())
+
+            withContext(Dispatchers.Main) {
+                mainActivity!!.setUpGraphView(series)
+            }
         }
-
-        val series = LineGraphSeries(dataPoints.toTypedArray())
-        mainActivity!!.setUpGraphView(series)
     }
 }

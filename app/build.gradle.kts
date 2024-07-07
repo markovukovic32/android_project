@@ -74,4 +74,5 @@ dependencies {
     implementation("com.jjoe64:graphview:4.2.1") {
         exclude(mapOf("group" to "com.android.support"))
     }
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
 }

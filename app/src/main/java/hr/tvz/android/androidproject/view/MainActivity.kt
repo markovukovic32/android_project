@@ -1,11 +1,13 @@
 package hr.tvz.android.androidproject.view
 
 import TransactionAdapter
+import android.app.Dialog
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.CalendarView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -14,12 +16,18 @@ import androidx.room.Room
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
+import hr.tvz.android.androidproject.R
 import hr.tvz.android.androidproject.controller.MainController
 import hr.tvz.android.androidproject.databinding.ActivityMainBinding
 import hr.tvz.android.androidproject.model.AppDatabase
 import hr.tvz.android.androidproject.model.Balance
 import hr.tvz.android.androidproject.model.BalanceDao
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -61,6 +69,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         mainController.setUpGraphView()
+        binding.graph.gridLabelRenderer.numHorizontalLabels = 4
     }
 
     override fun onResume() {
@@ -88,8 +97,12 @@ class MainActivity : AppCompatActivity() {
         textView.text = date
     }
     fun addTransaction(view: View) {
-        mainController.addTransaction()
-        mainController.setUpGraphView()
+        CoroutineScope(Dispatchers.IO).launch {
+            mainController.addTransaction()
+            withContext(Dispatchers.Main) {
+                mainController.setUpGraphView()
+            }
+        }
     }
     private fun initializeDatabase() {
         val db = Room.databaseBuilder(
@@ -116,13 +129,30 @@ class MainActivity : AppCompatActivity() {
         if(binding.graph.series.isNotEmpty()){
             binding.graph.removeAllSeries()
         }
-        binding.graph.gridLabelRenderer.labelFormatter = DateAsXAxisLabelFormatter(this, SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()))
+        binding.graph.gridLabelRenderer.labelFormatter = DateAsXAxisLabelFormatter(this@MainActivity, SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()))
         binding.graph.addSeries(series)
-        if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT){
+        if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             binding.graph.gridLabelRenderer.numHorizontalLabels = 3
         }
-        else{
-            binding.graph.gridLabelRenderer.numHorizontalLabels = 6
+        else {
+            binding.graph.gridLabelRenderer.numHorizontalLabels = 5
+        }
+        series.setOnDataPointTapListener { _, dataPoint ->
+            CoroutineScope(Dispatchers.IO).launch {
+                val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                val date = dateFormat.format(Date(dataPoint.x.toLong()))
+                val balance = dataPoint.y.toInt().toString()
+
+                withContext(Dispatchers.Main) {
+                    val dialog = Dialog(this@MainActivity)
+                    dialog.setContentView(R.layout.popup_graph_data)
+                    val dateView: TextView = dialog.findViewById(R.id.popupDate)
+                    val balanceView: TextView = dialog.findViewById(R.id.popupBalance)
+                    dateView.text = "Date: $date"
+                    balanceView.text = "Balance: $balance"
+                    dialog.show()
+                }
+            }
         }
     }
 }
