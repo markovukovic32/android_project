@@ -57,6 +57,5 @@ class NewTransactionActivity : AppCompatActivity() {
         )
         mainController.addTransactionToDatabase(transaction)
         mainController.refreshBalance()
-        mainController.setUpGraphView()
     }
 }

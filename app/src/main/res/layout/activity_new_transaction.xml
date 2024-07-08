@@ -82,7 +82,7 @@
             android:id="@+id/frequencyLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/type"
+            android:text="@string/frequency"
             android:layout_marginTop="16dp"
             style="@style/GraphLabelStyle"/>
 

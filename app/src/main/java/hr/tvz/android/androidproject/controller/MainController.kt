@@ -69,7 +69,7 @@ class MainController() {
         mainActivity?.let { setAdapter(transactions, it) }
     }
     private fun displayBalanceOnDate(newDate: String) {
-        mainActivity?.updateDateTextView("Balance on " + newDate + " is " + getBalanceUntilDate(newDate).current_balance + "EUR.")
+        mainActivity?.updateDateTextView("Balance on $newDate is ${"%.2f".format(getBalanceUntilDate(newDate).current_balance)} EUR.")
     }
     fun initializeAdapter(){
         val transactions = getAllTransactions()
@@ -91,6 +91,7 @@ class MainController() {
         transactionDao?.insertAll(transaction)
         val context = mainActivity ?: newTransactionActivity
         Toast.makeText(context, "Transaction added successfully", Toast.LENGTH_SHORT).show()
+        refreshBalance()
     }
     fun getBalanceUntilDate(date: String): Balance {
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -135,18 +136,14 @@ class MainController() {
                     else if(transaction.frequency == "Once a month"){
                         val endCalendar = Calendar.getInstance()
                         endCalendar.time = endDate
-
-                        while(transactionDate!!.before(balanceDate)){
+                        var monthsBetween = 0
+                        while(!transactionDate!!.after(endDate)){
                             calendar.add(Calendar.MONTH, 1)
                             transactionDate = calendar.time
+                            monthsBetween++
                         }
 
-                        val monthsBetween = when {
-                            calendar.get(Calendar.YEAR) == endCalendar.get(Calendar.YEAR) -> endCalendar.get(Calendar.MONTH) - calendar.get(Calendar.MONTH)
-                            else -> 12 * (endCalendar.get(Calendar.YEAR) - calendar.get(Calendar.YEAR)) + endCalendar.get(Calendar.MONTH) - calendar.get(Calendar.MONTH)
-                        } + 1
-
-                        if(monthsBetween < 0){
+                        if(monthsBetween <= 0){
                             return@forEach
                         }
 
@@ -157,10 +154,6 @@ class MainController() {
                     }
                 }
             }
-        }
-        Log.d("AddedTransactions", "Added transactions: $addedTransactions")
-        for(transaction in addedTransactions){
-            Log.d("AddedTransactions", "Added transaction: $transaction")
         }
         return balance
     }
@@ -194,9 +187,10 @@ class MainController() {
                 }
                 else if(transaction.frequency == "Once a month" && !wantedDate!!.before(transactionDate)){
                     val lastDayOfWantedMonth= calWanted.getActualMaximum(Calendar.DAY_OF_MONTH)
-                    if(cal.get(Calendar.DAY_OF_MONTH) == calWanted.get(Calendar.DAY_OF_MONTH) || ((cal.get(Calendar.DAY_OF_MONTH) > lastDayOfWantedMonth) && (calWanted.get(Calendar.DAY_OF_MONTH) == lastDayOfWantedMonth))){
-                        if(!cal.after(calWanted))
+                    if(cal.get(Calendar.DAY_OF_MONTH) == calWanted.get(Calendar.DAY_OF_MONTH) /*|| ((cal.get(Calendar.DAY_OF_MONTH) > lastDayOfWantedMonth) && (calWanted.get(Calendar.DAY_OF_MONTH) == lastDayOfWantedMonth))*/){
+                        if(!cal.after(calWanted)) {
                             transactions.add(transaction)
+                        }
                     }
                 }
             }
@@ -210,6 +204,7 @@ class MainController() {
         balanceDao?.delete(balanceDao!!.getAll()[0])
         balanceDao?.insertAll(balance)
         mainActivity?.getBalanceUntilDate(balance.date)
+        refreshBalance()
     }
 
     fun showTransactionOverview() {
@@ -227,6 +222,9 @@ class MainController() {
             transactionOverviewActivity?.let { setAdapter(getAllTransactions(), it) }
             mainActivity?.let { setAdapter(getTransactionOnDate(date!!), it) }
             displayBalanceOnDate(date!!)
+            refreshBalance()
+            val context = mainActivity ?: transactionOverviewActivity
+            Toast.makeText(context, "Transaction deleted successfully", Toast.LENGTH_SHORT).show()
         }
     }
 

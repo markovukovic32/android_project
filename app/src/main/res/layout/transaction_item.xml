@@ -40,6 +40,13 @@
                 android:text="Date"
                 android:textSize="16sp"
                 android:textColor="@android:color/darker_gray" />
+            <TextView
+                android:id="@+id/frequency"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Frequency"
+                android:textSize="16sp"
+                android:textColor="@android:color/darker_gray" />
 
             <TextView
                 android:id="@+id/type"

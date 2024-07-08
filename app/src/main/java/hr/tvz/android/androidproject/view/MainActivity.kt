@@ -97,7 +97,6 @@ class MainActivity : AppCompatActivity() {
     }
     fun addTransaction(view: View) {
         mainController.addTransaction()
-        mainController.setUpGraphView()
     }
     private fun initializeDatabase() {
         val db = Room.databaseBuilder(
@@ -108,7 +107,8 @@ class MainActivity : AppCompatActivity() {
         this.balanceDao = db.balanceDao()
     }
     fun setBalance(balance: Balance) {
-        binding.balance.text = "Current balance: " + balance.current_balance + " EUR"
+        binding.balance.text = "Current balance: %.2f EUR".format(balance.current_balance)
+        onDateSelected(getDate(Date()))
     }
 
     fun setAdapter(transactionAdapter: TransactionAdapter) {

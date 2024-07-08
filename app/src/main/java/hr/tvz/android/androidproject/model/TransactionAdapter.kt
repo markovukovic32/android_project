@@ -14,6 +14,7 @@ class TransactionAdapter(private val transactions: List<Transaction>, private va
         val amount: TextView = view.findViewById(R.id.amount)
         val date: TextView = view.findViewById(R.id.date)
         val type: TextView = view.findViewById(R.id.type)
+        val frequency: TextView = view.findViewById(R.id.frequency)
         val deleteButton: View = view.findViewById(R.id.deleteButton)
     }
 
@@ -35,6 +36,7 @@ class TransactionAdapter(private val transactions: List<Transaction>, private va
 
         holder.date.text = transaction.date
         holder.type.text = transaction.transactionType
+        holder.frequency.text = transaction.frequency
 
         if (transaction.transactionType == "Income") {
             holder.itemView.setBackgroundColor(Color.argb(255, 200, 255, 200)) // Light green
@@ -52,7 +54,6 @@ class TransactionAdapter(private val transactions: List<Transaction>, private va
     private fun deleteTransaction(transactionId: Int) {
         mainController.deleteTransaction(transactionId)
         mainController.refreshBalance()
-        mainController.setUpGraphView()
     }
 
     override fun getItemCount() = transactions.size
