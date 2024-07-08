@@ -96,12 +96,8 @@ class MainActivity : AppCompatActivity() {
         textView.text = date
     }
     fun addTransaction(view: View) {
-        CoroutineScope(Dispatchers.IO).launch {
-            mainController.addTransaction()
-            withContext(Dispatchers.Main) {
-                mainController.setUpGraphView()
-            }
-        }
+        mainController.addTransaction()
+        mainController.setUpGraphView()
     }
     private fun initializeDatabase() {
         val db = Room.databaseBuilder(

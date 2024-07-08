@@ -97,6 +97,7 @@ class MainController() {
         val endDate = sdf.parse(date)
         val transactions = transactionDao?.getAll()
         val balance = balanceDao!!.getAll()[0]
+        val addedTransactions = ArrayList<Transaction>()
 
         val balanceDate = sdf.parse(balance.date)
         if(endDate!!.before(balanceDate)){
@@ -109,6 +110,7 @@ class MainController() {
                 if (it.after(balanceDate) && !it.after(endDate) && transaction.frequency == "Only once") {
                     transaction.amount?.let { amount ->
                             balance.current_balance += if (transaction.transactionType == "Income") amount else -amount
+                        addedTransactions.add(transaction)
                     }
                 }
                 else{
@@ -127,6 +129,7 @@ class MainController() {
                         val weeksDifference = daysDifference / 7 + 1
                         transaction.amount?.let { amount ->
                             balance.current_balance += if (transaction.transactionType == "Income") amount * weeksDifference else -amount * weeksDifference
+                            addedTransactions.add(transaction)
                         }
                     }
                     else if(transaction.frequency == "Once a month"){
@@ -149,10 +152,15 @@ class MainController() {
 
                         transaction.amount?.let { amount ->
                             balance.current_balance += if (transaction.transactionType == "Income") amount * monthsBetween else -amount * monthsBetween
+                            addedTransactions.add(transaction)
                         }
                     }
                 }
             }
+        }
+        Log.d("AddedTransactions", "Added transactions: $addedTransactions")
+        for(transaction in addedTransactions){
+            Log.d("AddedTransactions", "Added transaction: $transaction")
         }
         return balance
     }
@@ -180,14 +188,14 @@ class MainController() {
                 }
 
                 if(transaction.frequency == "Once a week" && !wantedDate!!.before(transactionDate)){
-                    if(cal.get(Calendar.DAY_OF_WEEK) == calWanted.get(Calendar.DAY_OF_WEEK) && cal.before(calWanted)){
+                    if(cal.get(Calendar.DAY_OF_WEEK) == calWanted.get(Calendar.DAY_OF_WEEK) && !cal.after(calWanted)){
                         transactions.add(transaction)
                     }
                 }
                 else if(transaction.frequency == "Once a month" && !wantedDate!!.before(transactionDate)){
                     val lastDayOfWantedMonth= calWanted.getActualMaximum(Calendar.DAY_OF_MONTH)
                     if(cal.get(Calendar.DAY_OF_MONTH) == calWanted.get(Calendar.DAY_OF_MONTH) || ((cal.get(Calendar.DAY_OF_MONTH) > lastDayOfWantedMonth) && (calWanted.get(Calendar.DAY_OF_MONTH) == lastDayOfWantedMonth))){
-                        if(cal.before(calWanted))
+                        if(!cal.after(calWanted))
                             transactions.add(transaction)
                     }
                 }
